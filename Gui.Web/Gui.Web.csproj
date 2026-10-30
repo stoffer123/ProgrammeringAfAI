@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <BlazorDisableThrowNavigationException>true</BlazorDisableThrowNavigationException>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Subjects\2_IntegreretAI\" />
+    <Folder Include="Subjects\3_ChatbotPrompEngineering\" />
+    <Folder Include="Subjects\4_ChatbotContextEngineering\" />
+    <Folder Include="Subjects\5_AiAgenter\" />
+  </ItemGroup>
+
+</Project>

@@ -1,3 +1,5 @@
 <Solution>
+  <Project Path="../../AiToolkit/AiToolkit/AiToolkit.csproj" />
+  <Project Path="Gui.Web/Gui.Web.csproj" Id="3b12c465-0cc9-4174-ba43-6a74d0f133e5" />
   <Project Path="ProgrammeringAfAI/ProgrammeringAfAI.csproj" />
 </Solution>
