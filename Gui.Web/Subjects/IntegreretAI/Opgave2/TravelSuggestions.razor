@@ -1,0 +1,137 @@
+﻿@inject TravelSuggestionService Service
+
+<MudText Typo="Typo.h5" GutterBottom="true">Rejseforslag</MudText>
+<MudText Typo="Typo.body1" Class="mb-4">
+    Skriv dine feriepræferencer, og få ti forslag til destinationer eller rejsetyper.
+</MudText>
+
+<MudTextField @bind-Value="_input" Label="Tilføj præference" Variant="Variant.Outlined"
+              Placeholder="Fx natur, varme, lavt budget"
+              HelperText="Tryk Enter for at tilføje. Du kan skrive flere adskilt af komma."
+              Immediate="true" Disabled="@_loading" OnKeyUp="OnKeyUp"
+              Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Add"
+              OnAdornmentClick="AddFromInput" />
+
+@if (_preferences.Count > 0)
+{
+    <div class="mt-3">
+        @foreach (var p in _preferences)
+        {
+            <MudChip T="string" Text="@p" Color="Color.Primary"
+                     OnClose="@(_ => Remove(p))" Disabled="@_loading" />
+        }
+    </div>
+}
+
+<MudText Typo="Typo.caption" Class="mt-4 d-block">Idéer:</MudText>
+<div>
+    @foreach (var p in Presets.Where(p => !_preferences.Contains(p, StringComparer.OrdinalIgnoreCase)))
+    {
+        <MudChip T="string" Text="@p" Variant="Variant.Outlined" Size="Size.Small"
+                 Icon="@Icons.Material.Filled.Add" OnClick="@(() => Add(p))" Disabled="@_loading" />
+    }
+</div>
+
+<MudButton Variant="Variant.Filled" Color="Color.Primary" Class="mt-4"
+           StartIcon="@Icons.Material.Filled.FlightTakeoff"
+           Disabled="@(_loading || _preferences.Count < 2)" OnClick="SubmitAsync">
+    @if (_loading)
+    {
+        <MudProgressCircular Class="mr-2" Size="Size.Small" Indeterminate="true" />
+        <span>Finder forslag...</span>
+    }
+    else
+    {
+        <span>Find forslag</span>
+    }
+</MudButton>
+
+@if (_preferences.Count < 2)
+{
+    <MudText Typo="Typo.caption" Class="ml-2">Tilføj mindst to præferencer.</MudText>
+}
+
+@if (_error is not null)
+{
+    <MudAlert Severity="Severity.Error" Class="mt-4">@_error</MudAlert>
+}
+
+@if (_suggestions is not null)
+{
+    <MudText Typo="Typo.h6" Class="mt-6 mb-3">Ti forslag til din næste ferie</MudText>
+
+    <MudGrid>
+        @for (int i = 0; i < _suggestions.Count; i++)
+        {
+            var s = _suggestions[i];
+            int number = i + 1;
+            <MudItem xs="12" md="6">
+                <MudCard Outlined="true" Style="height: 100%">
+                    <MudCardContent>
+                        <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween">
+                            <MudText Typo="Typo.subtitle1"><b>@number. @s.Name</b></MudText>
+                            <MudChip T="string" Size="Size.Small" Variant="Variant.Text"
+                                     Icon="@(s.IsDestination ? Icons.Material.Filled.Place : Icons.Material.Filled.Hiking)"
+                                     Text="@(s.IsDestination ? "Destination" : "Rejsetype")" />
+                        </MudStack>
+                        <MudText Typo="Typo.body2" Color="Color.Secondary">@s.Reason</MudText>
+                    </MudCardContent>
+                </MudCard>
+            </MudItem>
+        }
+    </MudGrid>
+}
+
+@code {
+    private static readonly string[] Presets =
+        ["Natur", "Storby", "Varme", "Kultur", "Afslapning", "Eventyr", "God mad", "Lavt budget", "Børnevenligt", "Strand"];
+
+    private string _input = "";
+    private readonly List<string> _preferences = new();
+    private List<TravelSuggestion>? _suggestions;
+    private string? _error;
+    private bool _loading;
+
+    private void OnKeyUp(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+            AddFromInput();
+    }
+
+    private void AddFromInput()
+    {
+        // Tillad flere præferencer på én gang: "natur, varme, lavt budget"
+        foreach (var p in _input.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+            Add(p);
+
+        _input = "";
+    }
+
+    private void Add(string preference)
+    {
+        if (!_preferences.Contains(preference, StringComparer.OrdinalIgnoreCase))
+            _preferences.Add(preference);
+    }
+
+    private void Remove(string preference) => _preferences.Remove(preference);
+
+    private async Task SubmitAsync()
+    {
+        _loading = true;
+        _error = null;
+        _suggestions = null;
+
+        try
+        {
+            _suggestions = await Service.GetSuggestionsAsync(_preferences);
+        }
+        catch (Exception ex)
+        {
+            _error = $"Noget gik galt: {ex.Message}";
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+}

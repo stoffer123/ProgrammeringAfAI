@@ -1,17 +1,26 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <BlazorDisableThrowNavigationException>true</BlazorDisableThrowNavigationException>
+    <UserSecretsId>b22b381e-c0a4-46b7-b524-bade6092b6c3</UserSecretsId>
+	<NoWarn>$(NoWarn);OPENAI001</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Subjects\2_IntegreretAI\" />
-    <Folder Include="Subjects\3_ChatbotPrompEngineering\" />
-    <Folder Include="Subjects\4_ChatbotContextEngineering\" />
-    <Folder Include="Subjects\5_AiAgenter\" />
+    <Folder Include="Subjects\ChatbotPromptEngineering\" />
+    <Folder Include="Subjects\ChatbotContextEngineering\" />
+    <Folder Include="Subjects\AiAgenter\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MudBlazor" Version="9.12.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\AiToolkit\AiToolkit\AiToolkit.csproj" />
   </ItemGroup>
 
 </Project>

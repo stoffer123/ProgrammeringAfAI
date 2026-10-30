@@ -1,0 +1,55 @@
+﻿@page "/opgaver"
+@using Gui.Web.Subjects
+
+<PageTitle>Opgaver</PageTitle>
+
+<MudText Typo="Typo.h4" GutterBottom="true">Opgaver</MudText>
+
+<MudGrid>
+    <MudItem xs="12" sm="6">
+        <MudSelect T="Subject" Label="Emne" Variant="Variant.Outlined"
+                   Value="_subject" ValueChanged="OnSubjectChanged"
+                   ToStringFunc="@(s => s?.Name)">
+            @foreach (var subject in SubjectCatalog.All)
+            {
+                <MudSelectItem Value="subject" Disabled="@(subject.Assignments.Count == 0)">
+                    @subject.Name
+                </MudSelectItem>
+            }
+        </MudSelect>
+    </MudItem>
+
+    <MudItem xs="12" sm="6">
+        <MudSelect T="Assignment" Label="Opgave" Variant="Variant.Outlined"
+                   @bind-Value="_assignment"
+                   ToStringFunc="@(a => a?.Name)"
+                   Disabled="@(_subject is null)">
+            @if (_subject is not null)
+            {
+                @foreach (var assignment in _subject.Assignments)
+                {
+                    <MudSelectItem Value="assignment">@assignment.Name</MudSelectItem>
+                }
+            }
+        </MudSelect>
+    </MudItem>
+</MudGrid>
+
+@if (_assignment is not null)
+{
+    <MudPaper Class="pa-4 mt-4" Elevation="1">
+        <DynamicComponent Type="_assignment.Component" />
+    </MudPaper>
+}
+
+@code {
+    private Subject? _subject;
+    private Assignment? _assignment;
+
+    private void OnSubjectChanged(Subject subject)
+    {
+        _subject = subject;
+        // Vælg opgaven automatisk, hvis emnet kun har én
+        _assignment = subject.Assignments.Count == 1 ? subject.Assignments[0] : null;
+    }
+}
