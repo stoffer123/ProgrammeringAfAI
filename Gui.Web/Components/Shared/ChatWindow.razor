@@ -1,0 +1,115 @@
+﻿@using AiToolkit.Contracts
+@using AiToolkit.Conversations
+@using MudBlazor
+
+<MudPaper Outlined="true" Class="d-flex flex-column" Style="height: 65vh;">
+
+    @* column-reverse holder scroll i bunden automatisk, uden JavaScript *@
+    <div class="pa-4" style="flex: 1; overflow-y: auto; display: flex; flex-direction: column-reverse;">
+        <div>
+            @if (Conversation.Messages.Count == 0)
+            {
+                <MudText Typo="Typo.body2" Color="Color.Secondary" Align="Align.Center" Class="mt-4">
+                    @EmptyText
+                </MudText>
+            }
+
+            @foreach (var m in Conversation.Messages)
+            {
+                bool isUser = m.Role == ChatRole.User;
+                <div class="d-flex mb-3 @(isUser ? "justify-end" : "justify-start")">
+                    <MudPaper Elevation="0" Class="pa-3" Style="@BubbleStyle(isUser)">
+                        <MudText Typo="Typo.body1" Style="white-space: pre-wrap;">@m.Content</MudText>
+                    </MudPaper>
+                </div>
+            }
+
+            @if (_sending)
+            {
+                <div class="d-flex mb-3 justify-start">
+                    <MudPaper Elevation="0" Class="pa-3 d-flex align-center gap-2" Style="@BubbleStyle(false)">
+                        <MudProgressCircular Size="Size.Small" Indeterminate="true" />
+                        <MudText Typo="Typo.body2">Skriver...</MudText>
+                    </MudPaper>
+                </div>
+            }
+        </div>
+    </div>
+
+    @if (_error is not null)
+    {
+        <MudAlert Severity="Severity.Error" Dense="true" Class="mx-2"
+                  ShowCloseIcon="true" CloseIconClicked="@(() => _error = null)">
+            @_error
+        </MudAlert>
+    }
+
+    <div class="d-flex align-center gap-2 pa-2">
+        <MudTextField @bind-Value="_input" Placeholder="Skriv en besked..."
+                      Variant="Variant.Outlined" Margin="Margin.Dense" Immediate="true"
+                      Disabled="@_sending" OnKeyUp="OnKeyUp" Class="flex-grow-1" />
+
+        <MudIconButton Icon="@Icons.Material.Filled.Send" Color="Color.Primary"
+                       Disabled="@(_sending || string.IsNullOrWhiteSpace(_input))"
+                       OnClick="SendAsync" aria-label="Send" />
+
+        <MudIconButton Icon="@Icons.Material.Filled.DeleteSweep"
+                       Disabled="@(_sending || Conversation.Messages.Count == 0)"
+                       OnClick="Clear" aria-label="Ny samtale" />
+    </div>
+</MudPaper>
+
+@code {
+    /// <summary>The conversation to show and send messages to.</summary>
+    [Parameter, EditorRequired] public Conversation Conversation { get; set; } = default!;
+
+    /// <summary>Text shown before the first message.</summary>
+    [Parameter] public string EmptyText { get; set; } = "Start samtalen ved at skrive en besked.";
+
+    private string _input = "";
+    private string? _error;
+    private bool _sending;
+
+    private static string BubbleStyle(bool isUser) =>
+        "max-width: 75%; border-radius: 12px; " +
+        (isUser
+            ? "background: var(--mud-palette-primary); color: var(--mud-palette-primary-text);"
+            : "background: var(--mud-palette-background-gray);");
+
+    private async Task OnKeyUp(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+            await SendAsync();
+    }
+
+    private async Task SendAsync()
+    {
+        if (_sending || string.IsNullOrWhiteSpace(_input))
+            return;
+
+        string text = _input.Trim();
+        _input = "";
+        _sending = true;
+        _error = null;
+
+        try
+        {
+            await Conversation.SendAsync(text);
+        }
+        catch (Exception ex)
+        {
+            _error = $"Noget gik galt: {ex.Message}";
+            _input = text; // giv beskeden tilbage, så den kan sendes igen
+        }
+        finally
+        {
+            _sending = false;
+        }
+    }
+
+    private void Clear()
+    {
+        Conversation.Clear();
+        _error = null;
+    }
+}

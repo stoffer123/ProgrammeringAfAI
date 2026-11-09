@@ -10,7 +10,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Subjects\ChatbotPromptEngineering\" />
     <Folder Include="Subjects\ChatbotContextEngineering\" />
     <Folder Include="Subjects\AiAgenter\" />
   </ItemGroup>

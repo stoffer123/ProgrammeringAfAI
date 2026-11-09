@@ -1,0 +1,36 @@
+﻿@using Gui.Web.Subjects.ChatbotPromptEngineering.Common
+@using Gui.Web.Subjects.Common
+@inject IAiService Ai
+
+<MudText Typo="Typo.h5" GutterBottom="true">Turist guide</MudText>
+<MudText Typo="Typo.body1" Class="mb-4">
+    Turistguide for Frederikssund
+</MudText>
+<MudSelect T="Language" @bind-Value="_language"
+           Label="Sprog / Language"
+           Variant="Variant.Outlined"
+           ToStringFunc="@(l => l?.DisplayName)"
+           Class="mb-4" Style="max-width: 250px;">
+    @foreach (var language in Languages.All)
+    {
+        <MudSelectItem Value="language">@language.DisplayName</MudSelectItem>
+    }
+</MudSelect>
+<ChatWindow Conversation="_conversation" />
+
+@code {
+    private Conversation _conversation = default!;
+    private Language _language = Languages.Default;
+
+    protected override void OnInitialized()
+    {
+        _conversation = new Conversation(Ai, OpenAiModels.Gpt6Luna, b => b
+            .WithInstructions($"""
+                {_language.ResponseInstruction}
+
+                {GuidePrompt.Instructions}
+                """)
+            .WithReasoningEffort(ReasoningEffort.Low)
+            .WithMaxOutputTokens(4000));
+    }
+}

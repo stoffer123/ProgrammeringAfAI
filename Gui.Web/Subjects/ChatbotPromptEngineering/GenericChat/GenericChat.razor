@@ -1,0 +1,20 @@
+﻿@inject IAiService Ai
+
+<MudText Typo="Typo.h5" GutterBottom="true">Generisk chat</MudText>
+<MudText Typo="Typo.body1" Class="mb-4">
+    En almindelig chat, der husker tidligere beskeder i samtalen.
+</MudText>
+
+<ChatWindow Conversation="_conversation" />
+
+@code {
+    private Conversation _conversation = default!;
+
+    protected override void OnInitialized()
+    {
+        _conversation = new Conversation(Ai, OpenAiModels.Gpt6Luna, b => b
+            .WithInstructions("You are a helpful assistant. Answer in the same language as the user.")
+            .WithReasoningEffort(ReasoningEffort.Low)
+            .WithMaxOutputTokens(4000));
+    }
+}

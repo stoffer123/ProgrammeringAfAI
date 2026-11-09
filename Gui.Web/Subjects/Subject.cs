@@ -20,7 +20,12 @@ public static class SubjectCatalog
             new("integreretai-2", "Opgave 2: Rejseforslag", typeof(IntegreretAI.Opgave2.TravelSuggestions)),
             new("integreretai-3", "Opgave 3: Omskrivning til målgrupper", typeof(IntegreretAI.Opgave3.TextRewrite)),
         ]),
-        new("Chatbot (Prompt engineering)", []),
+        new("Chatbot (Prompt engineering)",
+        [
+            new("prompt-generic", "Generisk chat", typeof(ChatbotPromptEngineering.GenericChat.GenericChat)),
+            new("Chatbot-1", "Opgave 1: Turist guide", typeof(ChatbotPromptEngineering.TuristGuide.TuristGuide)),
+            new("Chatbot-2", "Opgave 2: Sprogvalg Turist guide", typeof(ChatbotPromptEngineering.SprogvalgTuristGuide.SprogvalgTuristGuide)),
+        ]),
         new("Chatbot (Context engineering)", []),
         new("AI Agenter", []),
     ];

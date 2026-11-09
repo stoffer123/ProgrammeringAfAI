@@ -1,0 +1,21 @@
+﻿@using Gui.Web.Subjects.ChatbotPromptEngineering.Common
+@inject IAiService Ai
+
+<MudText Typo="Typo.h5" GutterBottom="true">Turist guide</MudText>
+<MudText Typo="Typo.body1" Class="mb-4">
+    Turistguide for Frederikssund
+</MudText>
+
+<ChatWindow Conversation="_conversation" />
+
+@code {
+    private Conversation _conversation = default!;
+
+    protected override void OnInitialized()
+    {
+        _conversation = new Conversation(Ai, OpenAiModels.Gpt6Luna, b => b
+            .WithInstructions(GuidePrompt.Instructions)
+            .WithReasoningEffort(ReasoningEffort.Low)
+            .WithMaxOutputTokens(4000));
+    }
+}
