@@ -24,13 +24,15 @@
 
     protected override void OnInitialized()
     {
-        _conversation = new Conversation(Ai, OpenAiModels.Gpt6Luna, b => b
-            .WithInstructions($"""
-                {_language.ResponseInstruction}
+        _conversation = new Conversation(Ai, OpenAiModels.Gpt6Luna,
+            configure: b => b
+                .WithInstructions($"""
+            {_language.ResponseInstruction}
 
-                {GuidePrompt.Instructions}
-                """)
-            .WithReasoningEffort(ReasoningEffort.Low)
-            .WithMaxOutputTokens(4000));
+            {GuidePrompt.Instructions}
+            """)
+                .WithReasoningEffort(ReasoningEffort.Low)
+                .WithMaxOutputTokens(4000),
+            turnInstruction: () => _language.ReplyReminder);
     }
 }

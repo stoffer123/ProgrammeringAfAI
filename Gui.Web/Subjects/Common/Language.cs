@@ -8,6 +8,10 @@
             This rule overrides the language of the user's messages and of earlier replies.
             If the user writes in another language, still reply in {PromptName}.
             """;
+
+        /// <summary>A short reminder sent after each user message.</summary>
+        public string ReplyReminder =>
+            $"Reply in {PromptName}, regardless of the language of the user's and previous messages.";
     }
     public static class Languages
     {
